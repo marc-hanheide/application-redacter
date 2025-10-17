@@ -8,6 +8,11 @@ echo "Ollama Model Setup"
 echo "="
 
 # Get model from environment or use default
+
+if [ -f .env ]; then
+    export $(grep -v '^#' .env | xargs)
+fi
+
 MODEL=${OLLAMA_MODEL:-llama3.1}
 echo "Model to pull: $MODEL"
 

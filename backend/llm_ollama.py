@@ -53,6 +53,7 @@ class OllamaProvider(LLMProvider):
             
             # Handle 404 errors specifically (model not found)
             if response.status_code == 404:
+                logger.error(f"Ollama API returned '{response.text}'")
                 logger.error(f"Ollama model '{self.model}' not found. Please pull the model first.")
                 logger.error(f"Run: docker exec phd-redaction-ollama ollama pull {self.model}")
                 raise ValueError(
