@@ -268,31 +268,43 @@ def apply_redactions_to_docx(input_path, output_path, redactions):
     logger.info(f"Starting redaction process with {len(redactions)} redaction rules")
     
     def replace_in_paragraph(paragraph, find_text, replace_text):
-        """Replace text in a paragraph, handling text split across runs"""
+        """Replace text in a paragraph using word boundaries for single words, verbatim for phrases"""
         replacements = 0
         
-        # First, try simple replacement in each run (fast path for most cases)
-        for run in paragraph.runs:
-            if find_text in run.text:
-                count = run.text.count(find_text)
-                run.text = run.text.replace(find_text, replace_text)
-                replacements += count
+        # Determine if find_text is a single word or a multi-word phrase
+        is_single_word = len(find_text.split()) == 1
         
-        # If text wasn't found in any run but exists in paragraph.text,
+        # Escape special regex characters in find_text
+        escaped_find = re.escape(find_text)
+        
+        # Use word boundaries only for single words to avoid substring matches
+        if is_single_word:
+            pattern = r'\b' + escaped_find + r'\b'
+        else:
+            # For multi-word phrases, match verbatim (no word boundaries)
+            pattern = escaped_find
+        
+        # First, try replacement in each run (fast path for most cases)
+        for run in paragraph.runs:
+            if run.text:
+                # Count matches before replacement
+                matches = re.findall(pattern, run.text, re.IGNORECASE)
+                if matches:
+                    # Replace using regex
+                    new_text = re.sub(pattern, replace_text, run.text, flags=re.IGNORECASE)
+                    run.text = new_text
+                    replacements += len(matches)
+        
+        # If text wasn't found in any run but might exist in paragraph.text,
         # it's split across runs - use paragraph-level replacement
-        if replacements == 0 and find_text in paragraph.text:
-            # Get the full text
-            full_text = paragraph.text
-            
-            # Check if replacement is needed
-            if find_text not in full_text:
-                return 0
-            
+        full_text = paragraph.text
+        if replacements == 0 and re.search(pattern, full_text, re.IGNORECASE):
             # Count occurrences
-            count = full_text.count(find_text)
+            matches = re.findall(pattern, full_text, re.IGNORECASE)
+            count = len(matches)
             
-            # Replace in full text
-            new_text = full_text.replace(find_text, replace_text)
+            # Replace in full text using regex
+            new_text = re.sub(pattern, replace_text, full_text, flags=re.IGNORECASE)
             
             # Clear existing runs and create new one with replaced text
             # This preserves the paragraph but loses run-level formatting
@@ -390,8 +402,24 @@ def verify_redactions(file_path, redactions):
     missed_redactions = []
     for redaction in redactions:
         find_text = redaction['find']
-        if find_text in document_text:
-            count = document_text.count(find_text)
+        
+        # Determine if find_text is a single word or a multi-word phrase
+        is_single_word = len(find_text.split()) == 1
+        
+        # Escape special regex characters
+        escaped_find = re.escape(find_text)
+        
+        # Use word boundaries only for single words
+        if is_single_word:
+            pattern = r'\b' + escaped_find + r'\b'
+        else:
+            # For multi-word phrases, match verbatim
+            pattern = escaped_find
+        
+        # Search for the pattern (case-insensitive)
+        matches = re.findall(pattern, document_text, re.IGNORECASE)
+        if matches:
+            count = len(matches)
             missed_redactions.append({
                 'text': find_text,
                 'count': count,
