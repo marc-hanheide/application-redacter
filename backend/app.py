@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 import os
-import anthropic
 import tempfile
 import zipfile
 import shutil
@@ -11,6 +10,9 @@ import re
 from io import BytesIO
 import logging
 import sys
+from llm_interface import LLMProvider
+from llm_anthropic import AnthropicProvider
+from llm_ollama import OllamaProvider
 
 app = Flask(__name__)
 CORS(app)
@@ -36,15 +38,32 @@ ALLOWED_EXTENSIONS = {'docx'}
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 logger.info(f"Upload folder configured: {UPLOAD_FOLDER}")
 
-# Get Anthropic API key from environment
-ANTHROPIC_API_KEY = os.environ.get('ANTHROPIC_API_KEY')
-if not ANTHROPIC_API_KEY:
-    logger.error("ANTHROPIC_API_KEY environment variable not set")
-    raise ValueError("ANTHROPIC_API_KEY environment variable not set")
+# Initialize LLM provider based on configuration
+LLM_PROVIDER = os.environ.get('LLM_PROVIDER', 'anthropic').lower()
+logger.info(f"Configuring LLM provider: {LLM_PROVIDER}")
 
-logger.info("Anthropic API key loaded successfully")
-client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
-logger.info("Anthropic client initialized")
+llm_client: LLMProvider = None
+
+if LLM_PROVIDER == 'anthropic':
+    ANTHROPIC_API_KEY = os.environ.get('ANTHROPIC_API_KEY')
+    if not ANTHROPIC_API_KEY:
+        logger.error("ANTHROPIC_API_KEY environment variable not set")
+        raise ValueError("ANTHROPIC_API_KEY environment variable not set")
+    
+    model = os.environ.get('ANTHROPIC_MODEL', 'claude-sonnet-4-20250514')
+    llm_client = AnthropicProvider(api_key=ANTHROPIC_API_KEY, model=model)
+    logger.info(f"Initialized Anthropic provider with model: {model}")
+
+elif LLM_PROVIDER == 'ollama':
+    ollama_base_url = os.environ.get('OLLAMA_BASE_URL', 'http://ollama:11434')
+    ollama_model = os.environ.get('OLLAMA_MODEL', 'llama3.1')
+    llm_client = OllamaProvider(base_url=ollama_base_url, model=ollama_model)
+    logger.info(f"Initialized Ollama provider with model: {ollama_model} at {ollama_base_url}")
+
+else:
+    raise ValueError(f"Unsupported LLM provider: {LLM_PROVIDER}. Supported: anthropic, ollama")
+
+logger.info(f"LLM client ready: {llm_client.get_provider_name()}")
 
 
 def allowed_file(filename):
@@ -67,25 +86,12 @@ def extract_text_from_docx(file_path):
     return '\n'.join(full_text)
 
 
-def get_claude_response(prompt, max_tokens=10000):
-    """Get response from Claude API"""
+def get_llm_response(prompt, max_tokens=10000):
+    """Get response from configured LLM provider"""
     try:
-        message = client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=max_tokens,
-            messages=[
-                {"role": "user", "content": prompt}
-            ]
-        )
-        
-        response_text = message.content[0].text.strip()
-        # Clean up JSON formatting
-        response_text = response_text.replace('```json\n', '').replace('```\n', '').replace('```', '').strip()
-        
-        import json
-        return json.loads(response_text)
+        return llm_client.generate_response(prompt, max_tokens)
     except Exception as e:
-        app.logger.error(f"Claude API error: {str(e)}")
+        app.logger.error(f"LLM API error: {str(e)}")
         raise
 
 
@@ -123,7 +129,7 @@ Respond with a JSON object containing:
 
 YOUR ENTIRE RESPONSE MUST BE VALID JSON ONLY. DO NOT INCLUDE ANY TEXT OUTSIDE THE JSON STRUCTURE."""
 
-    return get_claude_response(prompt, max_tokens=10000)
+    return get_llm_response(prompt, max_tokens=10000)
 
 
 def get_redaction_plan(document_text):
@@ -218,7 +224,7 @@ IMPORTANT: Be thorough and extract EXACT text. Even a single character differenc
 This document MUST be completely anonymous with NO personal information that could identify the candidate.
 YOUR ENTIRE RESPONSE MUST BE VALID JSON ONLY."""
 
-    return get_claude_response(prompt, max_tokens=10000)
+    return get_llm_response(prompt, max_tokens=10000)
 
 
 def apply_redactions_to_docx(input_path, output_path, redactions):
@@ -627,6 +633,9 @@ def process_document():
         
     except Exception as e:
         app.logger.error(f"Error processing document: {str(e)}")
+        app.logger.error(f"Exception type: {type(e).__name__}")
+        import traceback
+        app.logger.error(f"Traceback: {traceback.format_exc()}")
         return jsonify({'error': f'Error processing document: {str(e)}'}), 500
 
 
