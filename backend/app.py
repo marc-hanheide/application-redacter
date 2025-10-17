@@ -264,6 +264,7 @@ def apply_redactions_to_docx(input_path, output_path, redactions):
     
     redaction_count = 0
     total_replacements = 0
+    redaction_details = []  # Track each redaction with counts
     
     logger.info(f"Starting redaction process with {len(redactions)} redaction rules")
     
@@ -330,7 +331,16 @@ def apply_redactions_to_docx(input_path, output_path, redactions):
             count = replace_in_paragraph(paragraph, find_text, replace_text)
             if count > 0:
                 total_replacements += count
-                redaction_count += 1
+                # Track this redaction
+                existing = next((r for r in redaction_details if r['find'] == find_text), None)
+                if existing:
+                    existing['count'] += count
+                else:
+                    redaction_details.append({
+                        'find': find_text,
+                        'replace': replace_text,
+                        'count': count
+                    })
     
     # Apply redactions to headers
     for section in doc.sections:
@@ -344,6 +354,15 @@ def apply_redactions_to_docx(input_path, output_path, redactions):
                 count = replace_in_paragraph(paragraph, find_text, replace_text)
                 if count > 0:
                     total_replacements += count
+                    existing = next((r for r in redaction_details if r['find'] == find_text), None)
+                    if existing:
+                        existing['count'] += count
+                    else:
+                        redaction_details.append({
+                            'find': find_text,
+                            'replace': replace_text,
+                            'count': count
+                        })
         
         # Footer
         footer = section.footer
@@ -355,6 +374,15 @@ def apply_redactions_to_docx(input_path, output_path, redactions):
                 count = replace_in_paragraph(paragraph, find_text, replace_text)
                 if count > 0:
                     total_replacements += count
+                    existing = next((r for r in redaction_details if r['find'] == find_text), None)
+                    if existing:
+                        existing['count'] += count
+                    else:
+                        redaction_details.append({
+                            'find': find_text,
+                            'replace': replace_text,
+                            'count': count
+                        })
     
     # Apply redactions to tables
     for table in doc.tables:
@@ -368,11 +396,20 @@ def apply_redactions_to_docx(input_path, output_path, redactions):
                         count = replace_in_paragraph(paragraph, find_text, replace_text)
                         if count > 0:
                             total_replacements += count
+                            existing = next((r for r in redaction_details if r['find'] == find_text), None)
+                            if existing:
+                                existing['count'] += count
+                            else:
+                                redaction_details.append({
+                                    'find': find_text,
+                                    'replace': replace_text,
+                                    'count': count
+                                })
     
     doc.save(output_path)
-    logger.info(f"Redaction complete: {redaction_count} unique patterns processed, {total_replacements} total replacements made")
+    logger.info(f"Redaction complete: {len(redaction_details)} unique patterns processed, {total_replacements} total replacements made")
     
-    return total_replacements
+    return total_replacements, redaction_details
 
 
 def verify_redactions(file_path, redactions):
@@ -487,7 +524,7 @@ def process_document():
         output_filename = f"redacted_{filename}"
         output_path = os.path.join(UPLOAD_FOLDER, output_filename)
         
-        redaction_count = apply_redactions_to_docx(input_path, output_path, redactions)
+        redaction_count, redaction_details = apply_redactions_to_docx(input_path, output_path, redactions)
         
         # Step 5: Verify redactions
         app.logger.info("Verifying redactions...")
@@ -522,7 +559,17 @@ def process_document():
             
             # Apply second pass
             temp_output = output_path + ".temp"
-            second_pass_count = apply_redactions_to_docx(output_path, temp_output, enhanced_redactions)
+            second_pass_count, second_pass_details = apply_redactions_to_docx(output_path, temp_output, enhanced_redactions)
+            
+            # Merge second pass details into main details
+            for detail in second_pass_details:
+                existing = next((r for r in redaction_details if r['find'] == detail['find']), None)
+                if existing:
+                    existing['count'] += detail['count']
+                else:
+                    redaction_details.append(detail)
+            
+            redaction_count += second_pass_count
             
             # Replace output with second pass result
             if os.path.exists(output_path):
@@ -556,13 +603,22 @@ def process_document():
         import uuid
         session_id = str(uuid.uuid4())
         session_file = os.path.join(UPLOAD_FOLDER, f"{session_id}.docx")
+        # Store original filename for download
+        session_metadata = os.path.join(UPLOAD_FOLDER, f"{session_id}.meta")
+        
         with open(session_file, 'wb') as f:
             f.write(redacted_file_data)
+        
+        # Save original filename metadata
+        import json
+        with open(session_metadata, 'w') as f:
+            json.dump({'original_filename': filename}, f)
         
         return jsonify({
             'summary': applicant_data.get('summary', ''),
             'applicantInfo': applicant_data.get('applicantInfo', {}),
             'redactionCount': redaction_count,
+            'redactionDetails': sorted(redaction_details, key=lambda x: x['count'], reverse=True),  # Sort by count, most first
             'downloadId': session_id,
             'fileName': output_filename,
             'redactionVerified': verification_passed,
@@ -579,15 +635,31 @@ def download_document(download_id):
     """Download redacted document"""
     try:
         session_file = os.path.join(UPLOAD_FOLDER, f"{download_id}.docx")
+        session_metadata = os.path.join(UPLOAD_FOLDER, f"{download_id}.meta")
         
         if not os.path.exists(session_file):
             return jsonify({'error': 'File not found or expired'}), 404
+        
+        # Load original filename from metadata
+        original_filename = "application.docx"  # default fallback
+        if os.path.exists(session_metadata):
+            try:
+                import json
+                with open(session_metadata, 'r') as f:
+                    metadata = json.load(f)
+                    original_filename = metadata.get('original_filename', 'application.docx')
+            except:
+                pass
+        
+        # Create redacted filename: basename_redacted.docx
+        base_name = original_filename.rsplit('.', 1)[0] if '.' in original_filename else original_filename
+        redacted_filename = f"{base_name}_redacted.docx"
         
         # Send file and then delete it
         response = send_file(
             session_file,
             as_attachment=True,
-            download_name=f"redacted_application.docx",
+            download_name=redacted_filename,
             mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
         )
         
@@ -596,6 +668,8 @@ def download_document(download_id):
         def cleanup():
             try:
                 os.remove(session_file)
+                if os.path.exists(session_metadata):
+                    os.remove(session_metadata)
             except:
                 pass
         

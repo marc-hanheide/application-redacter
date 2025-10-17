@@ -146,6 +146,28 @@ body {
   background-color: #f0fff4;
 }
 
+.result-card.warning {
+  background-color: #fffaf0;
+  border-left: 4px solid #ed8936;
+}
+
+.warning-text {
+  color: #2d3748;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.missed-list {
+  list-style-type: disc;
+  margin-left: 1.5rem;
+  color: #2d3748;
+  font-size: 0.875rem;
+}
+
+.missed-list li {
+  margin-bottom: 0.5rem;
+}
+
 .section-title {
   font-size: 1.25rem;
   font-weight: 600;
@@ -213,6 +235,90 @@ body {
   background-color: #38a169;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+}
+
+.redaction-details-section {
+  margin: 1.5rem 0;
+  padding-top: 1rem;
+  border-top: 2px solid #e2e8f0;
+}
+
+.toggle-details-button {
+  background-color: #edf2f7;
+  color: #2d3748;
+  padding: 0.5rem 1rem;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 1rem;
+}
+
+.toggle-details-button:hover {
+  background-color: #e2e8f0;
+  border-color: #a0aec0;
+}
+
+.redaction-details-list {
+  margin-top: 1rem;
+  background-color: white;
+  border-radius: 6px;
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+}
+
+.redaction-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.redaction-table th {
+  background-color: #f7fafc;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #2d3748;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.redaction-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  color: #4a5568;
+}
+
+.redaction-table tbody tr:hover {
+  background-color: #f7fafc;
+}
+
+.original-text {
+  font-family: 'Courier New', monospace;
+  background-color: #fff5f5;
+  color: #c53030;
+}
+
+.replacement-text {
+  font-family: 'Courier New', monospace;
+  background-color: #f0fff4;
+  color: #2f855a;
+}
+
+.count-text {
+  text-align: center;
+  font-weight: 600;
+  color: #667eea;
+}
+
+.detail-summary {
+  font-size: 0.875rem;
+  color: #718096;
+  text-align: right;
+  font-style: italic;
+  margin-top: 0.5rem;
 }
 
 .footer {

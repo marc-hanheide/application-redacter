@@ -6,6 +6,7 @@ function App() {
   const [processing, setProcessing] = useState(false);
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
+  const [showRedactionDetails, setShowRedactionDetails] = useState(false);
 
   // Use relative URL to proxy through Nginx - no need to specify backend port
   const API_URL = '';
@@ -179,6 +180,46 @@ function App() {
                 <p className="meta-text">
                   {results.redactionCount} redactions applied
                 </p>
+                
+                {results.redactionDetails && results.redactionDetails.length > 0 && (
+                  <div className="redaction-details-section">
+                    <button 
+                      onClick={() => setShowRedactionDetails(!showRedactionDetails)}
+                      className="toggle-details-button"
+                    >
+                      {showRedactionDetails ? '▼' : '▶'} 
+                      {showRedactionDetails ? ' Hide Redaction Details' : ' Show Detailed Redaction List'}
+                    </button>
+                    
+                    {showRedactionDetails && (
+                      <div className="redaction-details-list">
+                        <table className="redaction-table">
+                          <thead>
+                            <tr>
+                              <th>Original Text</th>
+                              <th>Replaced With</th>
+                              <th>Count</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {results.redactionDetails.map((detail, idx) => (
+                              <tr key={idx}>
+                                <td className="original-text">{detail.find}</td>
+                                <td className="replacement-text">{detail.replace}</td>
+                                <td className="count-text">{detail.count}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                        <p className="detail-summary">
+                          Total: {results.redactionDetails.length} unique redactions, 
+                          {' '}{results.redactionDetails.reduce((sum, d) => sum + d.count, 0)} total replacements
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
                 <button
                   onClick={downloadRedactedDocument}
                   className="download-button"
