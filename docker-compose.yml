@@ -21,7 +21,7 @@ services:
       dockerfile: Dockerfile
     container_name: phd-redaction-frontend
     ports:
-      - "80:80"
+      - "8099:80"
     depends_on:
       - backend
     restart: unless-stopped
