@@ -78,16 +78,33 @@ Open your browser and navigate to:
 
 ## What Gets Redacted
 
-According to AgriFoRwArdS CDT policy:
+**Complete anonymisation following strict equality and diversity guidelines.**
 
-- ✓ Personal names → `[NAME REDACTED]`
-- ✓ Institution names → `[Name of University]`
+For full details, see [REDACTION_RULES.md](REDACTION_RULES.md)
+
+### Critical Redactions:
+- ✓ **ALL personal names** (applicant's name removed from EVERY instance) → `[NAME REDACTED]`
+- ✓ Institution names → `[Name of University]`, `[Name of Research Institute]`
 - ✓ Employer names → `[Name of Company/Organisation]`
-- ✓ Article titles → `[Title of Article]`
-- ✓ Web links → `[LINK REMOVED]`
-- ✓ Contact details (email, phone, addresses)
-- ✓ EDI characteristics (age, gender, ethnicity, nationality, religion, etc.)
-- ✓ Dates that could identify age → `[Date]`
+- ✓ Publication & thesis titles → `[Title of Article]`, `[Title of Thesis]`
+- ✓ Web links & profiles (LinkedIn, ResearchGate, etc.) → `[LINK REMOVED]`
+- ✓ Contact details (email, phone, addresses) → `[EMAIL REDACTED]`, `[PHONE REDACTED]`
+
+### Protected Characteristics (Equality Act Compliance):
+- ✓ Age, date of birth → `[DATE REDACTED]`
+- ✓ Gender, gender identity → `[REDACTED]`
+- ✓ Ethnicity, race, nationality → `[REDACTED]`
+- ✓ Religion, beliefs → `[REDACTED]`
+- ✓ Disability, health conditions → `[REDACTED]`
+- ✓ Marital status, family circumstances → `[REDACTED]`
+- ✓ Sexual orientation → `[REDACTED]`
+
+### Additional Identifying Information:
+- ✓ Specific geographic locations → `[Location]`
+- ✓ Unique identifiers (student IDs, grant numbers) → `[ID REDACTED]`
+- ✓ Dates that could reveal age → `[Date]` or `[Year]`
+
+**Principle**: When in doubt, REDACT IT. The system ensures complete anonymity for fair assessment.
 
 ## Management Commands
 

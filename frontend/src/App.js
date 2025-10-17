@@ -146,10 +146,35 @@ function App() {
                 </div>
               </div>
 
+              {!results.redactionVerified && (
+                <div className="result-card warning">
+                  <h2 className="section-title">Manual Redaction Required</h2>
+                  <p className="warning-text">
+                    <strong>Warning:</strong> Some identifying information could not be automatically redacted.<br />
+                    Please review the document and manually remove the following items before sharing:
+                  </p>
+                  <ul className="missed-list">
+                    {results.missedRedactions && results.missedRedactions.length > 0 ? (
+                      results.missedRedactions.map((miss, idx) => (
+                        <li key={idx}>
+                          <strong>{miss.text}</strong>
+                          {miss.count ? ` (${miss.count} occurrence${miss.count > 1 ? 's' : ''})` : ''}
+                          {miss.replacement ? ` → should be replaced with: ${miss.replacement}` : ''}
+                        </li>
+                      ))
+                    ) : (
+                      <li>No details available.</li>
+                    )}
+                  </ul>
+                </div>
+              )}
+
               <div className="result-card success">
                 <h2 className="section-title">Redacted Document Ready</h2>
                 <p className="success-text">
-                  All identifying information has been removed. The document is now ready for anonymous review.
+                  {results.redactionVerified
+                    ? 'All identifying information has been removed. The document is now ready for anonymous review.'
+                    : 'Some identifying information may remain. Please review the list above and manually redact as needed.'}
                 </p>
                 <p className="meta-text">
                   {results.redactionCount} redactions applied

@@ -20,5 +20,8 @@ RUN mkdir -p /tmp/uploads
 # Expose port
 EXPOSE 5000
 
-# Run with gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "--timeout", "300", "app:app"]
+# Environment variable for Python to show logs immediately
+ENV PYTHONUNBUFFERED=1
+
+# Run with gunicorn with logging to stdout
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "--timeout", "300", "--log-level", "info", "--access-logfile", "-", "--error-logfile", "-", "app:app"]
