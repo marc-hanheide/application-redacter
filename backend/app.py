@@ -67,7 +67,7 @@ def extract_text_from_docx(file_path):
     return '\n'.join(full_text)
 
 
-def get_claude_response(prompt, max_tokens=4000):
+def get_claude_response(prompt, max_tokens=10000):
     """Get response from Claude API"""
     try:
         message = client.messages.create(
@@ -113,7 +113,7 @@ Extract the following information:
    - religion: religion (if mentioned, otherwise null)
 
 Document text:
-{document_text[:10000]}
+{document_text[:30000]}
 
 Respond with a JSON object containing:
 {{
@@ -123,7 +123,7 @@ Respond with a JSON object containing:
 
 YOUR ENTIRE RESPONSE MUST BE VALID JSON ONLY. DO NOT INCLUDE ANY TEXT OUTSIDE THE JSON STRUCTURE."""
 
-    return get_claude_response(prompt, max_tokens=2000)
+    return get_claude_response(prompt, max_tokens=10000)
 
 
 def get_redaction_plan(document_text):
@@ -133,7 +133,7 @@ def get_redaction_plan(document_text):
 STRICT REDACTION RULES - REMOVE ALL OF THE FOLLOWING:
 
 1. **ALL PERSONAL NAMES** - This is CRITICAL:
-   - The applicant's full name, first name, surname, middle names
+   - Any full name, first name, surname, middle names MUST BE REDACTED
    - ANY occurrence of the applicant's name throughout the ENTIRE document
    - Names of referees, supervisors, colleagues, collaborators
    - Authors' names in publications or references
@@ -141,18 +141,18 @@ STRICT REDACTION RULES - REMOVE ALL OF THE FOLLOWING:
    - Check for names in signatures, letterheads, headers, footers
 
 2. **Institution Names**:
-   - Universities, colleges, schools attended (replace with "[Name of University]", "[Name of College]")
-   - Research institutes, laboratories (replace with "[Name of Research Institute]")
+   - Universities, colleges, schools attended (replace with "[NAME OF UNIVERSITY]", "[NAME OF COLLEGE]")
+   - Research institutes, laboratories (replace with "[NAME OF RESEARCH INSTITUTE]")
    - Be thorough - check for institution names in addresses, email domains, affiliations
 
 3. **Employer Names**:
-   - Companies, organizations, NGOs (replace with "[Name of Company/Organisation]")
+   - Companies, organizations, NGOs (replace with "[NAME OF COMPANY/ORGANISATION]")
    - Government departments, agencies
 
 4. **Publications & Research**:
-   - Article titles, paper titles, thesis titles (replace with "[Title of Article/Paper/Thesis]")
-   - Book titles authored by the applicant (replace with "[Title of Book]")
-   - Conference presentation titles (replace with "[Title of Presentation]")
+   - Article titles, paper titles, thesis titles (replace with "[TITLE OF ARTICLE/PAPER/THESIS]")
+   - Book titles authored by the applicant (replace with "[TITLE OF BOOK]")
+   - Conference presentation titles (replace with "[TITLE OF PRESENTATION]")
    - Keep journal names and conference names (these are not identifying)
 
 5. **Personal Contact Information**:
@@ -173,21 +173,21 @@ STRICT REDACTION RULES - REMOVE ALL OF THE FOLLOWING:
    - Photographs, images of the applicant (note if present)
 
 7. **Identifying Dates**:
-   - Graduation dates that could reveal age (replace with "[Date]" or "[Year]")
+   - Graduation dates that could reveal age (replace with "[DATE]" or "[YEAR]")
    - Employment dates if they reveal age (replace with duration instead, e.g., "3 years")
    - Birth dates (replace with [DATE REDACTED])
 
 8. **Geographic Identifiers**:
-   - Specific cities, towns, regions where the applicant lived/studied/worked (replace with "[Location]")
+   - Specific cities, towns, regions where the applicant lived/studied/worked (replace with "[LOCATION REDACTED]")
    - Keep country names only if essential to understanding research context
 
 9. **Unique Identifiers**:
    - Student ID numbers, employee numbers (replace with [ID REDACTED])
-   - Grant numbers or awards that could identify the applicant (replace with "[Grant Reference]")
-   - Unique project names that could identify the applicant (replace with "[Project Name]")
+   - Grant numbers or awards that could identify the applicant (replace with "[GRANT REFERENCE REDACTED]")
+   - Unique project names that could identify the applicant (replace with "[PROJECT NAME REDACTED]")
 
 CRITICAL INSTRUCTIONS:
-- The applicant's name MUST be removed from EVERY instance it appears, also check for variations of the name and redact them, anything that looks like a name must be redacted
+- Any names MUST be removed from EVERY instance it appears, also check for variations of the name and redact them, anything that looks like a name must be redacted
 - Be EXHAUSTIVE - check headers, footers, signatures, contact details, CVs, personal statements
 - If unsure whether something is identifying, REDACT IT - err on the side of caution
 - Preserve the meaning and structure of the document, but ensure complete anonymity
@@ -203,7 +203,7 @@ For each piece of text that needs redaction, provide:
 - The replacement text (should be descriptive and appropriate)
 
 Document text:
-{document_text[:10000]}
+{document_text[:30000]}
 
 Provide a comprehensive list of redactions in JSON format:
 {{
@@ -217,7 +217,7 @@ IMPORTANT: Be thorough and extract EXACT text. Even a single character differenc
 This document MUST be completely anonymous with NO personal information that could identify the candidate.
 YOUR ENTIRE RESPONSE MUST BE VALID JSON ONLY."""
 
-    return get_claude_response(prompt, max_tokens=4000)
+    return get_claude_response(prompt, max_tokens=10000)
 
 
 def apply_redactions_to_docx(input_path, output_path, redactions):
@@ -225,38 +225,41 @@ def apply_redactions_to_docx(input_path, output_path, redactions):
     doc = Document(input_path)
 
     # Remove all hyperlinks in the document (including display text)
-    def remove_hyperlinks(doc):
-        link_count = 0
-        # Remove hyperlinks in main document
-        for paragraph in doc.paragraphs:
-            for run in paragraph.runs:
-                if getattr(run, 'hyperlink', None) is not None or 'HYPERLINK' in run._element.xml:
-                    run.text = '[LINK REMOVED]'
-                    link_count += 1
-        # Remove hyperlinks in tables
-        for table in doc.tables:
-            for row in table.rows:
-                for cell in row.cells:
-                    for paragraph in cell.paragraphs:
-                        for run in paragraph.runs:
-                            if getattr(run, 'hyperlink', None) is not None or 'HYPERLINK' in run._element.xml:
-                                run.text = '[LINK REMOVED]'
-                                link_count += 1
-        # Remove hyperlinks in headers/footers
-        for section in doc.sections:
-            for paragraph in section.header.paragraphs:
-                for run in paragraph.runs:
-                    if getattr(run, 'hyperlink', None) is not None or 'HYPERLINK' in run._element.xml:
-                        run.text = '[LINK REMOVED]'
-                        link_count += 1
-            for paragraph in section.footer.paragraphs:
-                for run in paragraph.runs:
-                    if getattr(run, 'hyperlink', None) is not None or 'HYPERLINK' in run._element.xml:
-                        run.text = '[LINK REMOVED]'
-                        link_count += 1
-        logger.info(f"Removed {link_count} hyperlinks from document.")
+    from docx.oxml.ns import qn
+    link_count = 0
+    def remove_hyperlinks_from_element(element):
+        nonlocal link_count
+        # Find all hyperlink elements
+        hyperlinks = element.findall('.//w:hyperlink', namespaces=element.nsmap)
+        for hyperlink in hyperlinks:
+            # Get the display text (all w:t elements inside the hyperlink)
+            texts = hyperlink.findall('.//w:t', namespaces=element.nsmap)
+            for t in texts:
+                t.text = '[LINK REMOVED]'
+            # Replace the hyperlink with its children (removes the link but keeps the text)
+            parent = hyperlink.getparent()
+            idx = parent.index(hyperlink)
+            for child in list(hyperlink):
+                parent.insert(idx, child)
+                idx += 1
+            parent.remove(hyperlink)
+            link_count += 1
 
-    remove_hyperlinks(doc)
+    # Remove hyperlinks in main document
+    remove_hyperlinks_from_element(doc._element)
+    # Remove hyperlinks in headers/footers
+    for section in doc.sections:
+        if hasattr(section.header, '_element'):
+            remove_hyperlinks_from_element(section.header._element)
+        if hasattr(section.footer, '_element'):
+            remove_hyperlinks_from_element(section.footer._element)
+    # Remove hyperlinks in tables
+    for table in doc.tables:
+        for row in table.rows:
+            for cell in row.cells:
+                if hasattr(cell, '_element'):
+                    remove_hyperlinks_from_element(cell._element)
+    logger.info(f"Removed {link_count} hyperlinks from document.")
     
     redaction_count = 0
     total_replacements = 0
