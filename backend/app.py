@@ -163,6 +163,7 @@ STRICT REDACTION RULES - REMOVE ALL OF THE FOLLOWING:
    - Web links to personal profiles, LinkedIn, ResearchGate, personal websites (replace with [LINK REMOVED])
 
 6. **Protected Characteristics** (CRITICAL for fair recruitment):
+   - remove ANY PRONOUNS that could indicate gender, replace them with the gender-neutral pronouns "they"/"their"/"them"
    - Age, date of birth, year of birth (replace with [DATE REDACTED])
    - Gender, gender identity (replace with [REDACTED])
    - Ethnicity, race, nationality, country of origin (replace with [REDACTED])
