@@ -1,0 +1,145 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║              PhD APPLICATION ANONYMISATION SYSTEM - WEBAPP                   ║
+║                   AgriFoRwArdS CDT - Docker Deployment                       ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+📦 PACKAGE CONTENTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✓ phd-redaction-webapp.tar.gz (12 KB) - Complete application package
+✓ DEPLOYMENT_GUIDE.md - Quick reference for deployment
+
+🏗️  ARCHITECTURE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+┌─────────────────────────────────────────────────────────────────────┐
+│  Frontend Container (React + Nginx)                                  │
+│  • Modern React UI                                                   │
+│  • Responsive design                                                 │
+│  • Nginx web server & API proxy                                      │
+│  • Port: 80                                                          │
+└─────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    │ HTTP API
+                                    ↓
+┌─────────────────────────────────────────────────────────────────────┐
+│  Backend Container (Python Flask)                                    │
+│  • Flask REST API                                                    │
+│  • Claude API integration                                            │
+│  • python-docx processing                                            │
+│  • Port: 5000 (internal)                                             │
+└─────────────────────────────────────────────────────────────────────┘
+
+🚀 QUICK START (3 COMMANDS)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Extract:
+   $ tar -xzf phd-redaction-webapp.tar.gz
+   $ cd phd-redaction-webapp
+
+2. Configure:
+   $ cp .env.example .env
+   $ nano .env  # Add your Anthropic API key
+
+3. Deploy:
+   $ ./deploy.sh
+   # OR
+   $ docker-compose up -d
+
+4. Access:
+   Open browser: http://localhost
+
+⚙️  SYSTEM REQUIREMENTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✓ Docker 20.10+
+✓ Docker Compose 2.0+
+✓ 2GB RAM minimum (4GB recommended)
+✓ 2GB free disk space
+✓ Internet connection (for Claude API)
+✓ Anthropic API key (get from console.anthropic.com)
+
+🔒 WHAT GETS REDACTED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Personal Names        →  [NAME REDACTED]
+Universities          →  [Name of University]
+Employers             →  [Name of Company/Organisation]
+Article Titles        →  [Title of Article]
+Web Links             →  [LINK REMOVED]
+Email Addresses       →  (removed)
+Phone Numbers         →  (removed)
+EDI Characteristics   →  (removed)
+  • Age, Gender, Ethnicity
+  • Nationality, Religion
+  • Disability, Marital Status
+
+📋 FEATURES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Complete web-based solution - no command line for end users
+✅ AI-powered intelligent redaction using Claude
+✅ Preserves Word document formatting perfectly
+✅ Separate unredacted summary for administrators
+✅ Secure server-side processing
+✅ One-command Docker deployment
+✅ Production-ready with Nginx
+✅ Responsive modern UI
+
+🛠️  MANAGEMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Start:       docker-compose up -d
+Stop:        docker-compose down
+Logs:        docker-compose logs -f
+Restart:     docker-compose restart
+Status:      docker-compose ps
+Rebuild:     docker-compose up -d --build
+
+📚 DOCUMENTATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Full documentation in the package:
+• README.md - Complete guide (70+ pages)
+• DEPLOYMENT_GUIDE.md - Quick reference
+• .env.example - Configuration template
+
+🌐 ACCESS AFTER DEPLOYMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Local:           http://localhost
+Remote Server:   http://your-server-ip
+API Health:      http://localhost/api/health
+
+⚠️  IMPORTANT NOTES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+• Keep .env file secure - never commit to git
+• Get API key from: https://console.anthropic.com/
+• Use HTTPS in production (configure SSL)
+• Consider adding authentication for production
+• Regular Docker image updates recommended
+
+💡 SUPPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Troubleshooting:
+1. Check logs: docker-compose logs
+2. Verify API key in .env file
+3. Ensure Docker services running
+4. Review DEPLOYMENT_GUIDE.md
+
+🎯 BUILT FOR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+AgriFoRwArdS CDT - Centre for Doctoral Training
+Supporting fair, unbiased recruitment in STEM fields
+Promoting equality, diversity, and inclusion
+
+Version 1.0.0 - October 2025
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                      READY FOR DEPLOYMENT ON YOUR SERVER                     ║
+╚══════════════════════════════════════════════════════════════════════════════╝

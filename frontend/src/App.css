@@ -1,0 +1,244 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.app {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  padding: 2.5rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #1a202c;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: #718096;
+  margin-bottom: 1.5rem;
+}
+
+.info-banner {
+  background-color: #ebf8ff;
+  border-left: 4px solid #3182ce;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 4px;
+}
+
+.info-banner p {
+  font-size: 0.875rem;
+  color: #2d3748;
+  line-height: 1.6;
+}
+
+.upload-section {
+  margin-bottom: 1.5rem;
+}
+
+.upload-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+}
+
+.file-input {
+  display: block;
+  width: 100%;
+  font-size: 0.875rem;
+  color: #4a5568;
+  padding: 0.75rem;
+  border: 2px dashed #cbd5e0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.file-input:hover {
+  border-color: #667eea;
+  background-color: #f7fafc;
+}
+
+.file-selected {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #4a5568;
+}
+
+.process-button {
+  width: 100%;
+  background-color: #667eea;
+  color: white;
+  padding: 0.875rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.process-button:hover:not(:disabled) {
+  background-color: #5568d3;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.process-button:disabled {
+  background-color: #cbd5e0;
+  cursor: not-allowed;
+}
+
+.error-banner {
+  margin-top: 1.5rem;
+  background-color: #fff5f5;
+  border-left: 4px solid #fc8181;
+  padding: 1rem;
+  border-radius: 4px;
+}
+
+.error-banner p {
+  color: #c53030;
+  font-size: 0.875rem;
+}
+
+.results-section {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.result-card {
+  background-color: #f7fafc;
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.result-card.success {
+  background-color: #f0fff4;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a202c;
+  margin-bottom: 0.75rem;
+}
+
+.summary-text {
+  color: #2d3748;
+  line-height: 1.6;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.info-table {
+  min-width: 100%;
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.info-table th {
+  background-color: #edf2f7;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #2d3748;
+  border: 1px solid #e2e8f0;
+}
+
+.info-table td {
+  padding: 0.75rem 1rem;
+  border: 1px solid #e2e8f0;
+  color: #4a5568;
+}
+
+.success-text {
+  color: #2d3748;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.meta-text {
+  color: #718096;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.download-button {
+  background-color: #48bb78;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.download-button:hover {
+  background-color: #38a169;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+}
+
+.footer {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.footer p {
+  font-size: 0.875rem;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .app {
+    padding: 1rem;
+  }
+
+  .card {
+    padding: 1.5rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .table-container {
+    overflow-x: scroll;
+  }
+}
