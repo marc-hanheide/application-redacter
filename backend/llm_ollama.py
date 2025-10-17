@@ -36,7 +36,7 @@ class OllamaProvider(LLMProvider):
             Dict containing the parsed JSON response
         """
         try:
-            logger.debug(f"Sending request to Ollama API (model: {self.model})")
+            logger.info(f"Sending request to Ollama API (model: {self.model}, max_tokens: {max_tokens})")
             
             url = f"{self.base_url}/api/generate"
             payload = {
@@ -50,20 +50,45 @@ class OllamaProvider(LLMProvider):
             }
             
             response = requests.post(url, json=payload, timeout=300)
+            
+            # Handle 404 errors specifically (model not found)
+            if response.status_code == 404:
+                logger.error(f"Ollama model '{self.model}' not found. Please pull the model first.")
+                logger.error(f"Run: docker exec phd-redaction-ollama ollama pull {self.model}")
+                raise ValueError(
+                    f"Ollama model '{self.model}' not found. "
+                    f"Please pull it first: docker exec phd-redaction-ollama ollama pull {self.model}"
+                )
+            
             response.raise_for_status()
             
             result = response.json()
             response_text = result.get('response', '').strip()
             
-            logger.debug(f"Received response from Ollama API ({len(response_text)} chars)")
+            logger.info(f"Received response from Ollama API ({len(response_text)} chars)")
             
-            return self._clean_and_parse_json(response_text)
+            # Log preview for debugging
+            preview = response_text[:200].replace('\n', ' ')
+            logger.debug(f"Response preview: {preview}...")
             
+            # Parse and return JSON
+            parsed = self._clean_and_parse_json(response_text)
+            logger.info("Successfully parsed JSON response")
+            return parsed
+            
+        except requests.exceptions.ConnectionError as e:
+            logger.error(f"Cannot connect to Ollama at {self.base_url}")
+            logger.error(f"Make sure Ollama service is running: docker compose ps ollama")
+            raise
+        except requests.exceptions.Timeout as e:
+            logger.error(f"Ollama request timed out after 300s")
+            raise
         except requests.exceptions.RequestException as e:
             logger.error(f"Ollama API request error: {str(e)}")
             raise
         except Exception as e:
-            logger.error(f"Ollama API error: {str(e)}")
+            logger.error(f"Error processing Ollama response: {str(e)}")
+            logger.error(f"Response text that failed to parse: {response_text[:500] if 'response_text' in locals() else 'N/A'}")
             raise
     
     def get_provider_name(self) -> str:
