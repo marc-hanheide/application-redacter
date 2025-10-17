@@ -4,7 +4,7 @@ set -e
 
 echo "================================================"
 echo "PhD Application Anonymisation System"
-echo "AgriFoRwArdS CDT Deployment Script"
+echo "Deployment Script"
 echo "================================================"
 echo ""
 

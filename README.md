@@ -1,7 +1,5 @@
 # PhD Application Anonymisation System
 
-**AgriFoRwArdS CDT - Hosted Web Application**
-
 A complete web-based solution for anonymising PhD applications to support fair and unbiased recruitment.
 
 ## Features
@@ -284,13 +282,13 @@ This tool supports fair recruitment by:
 - Removing unconscious bias from shortlisting
 - Ensuring equality of opportunity
 - Promoting diversity and inclusion
-- Supporting EDI commitments in STEM fields
+- Supporting EDI commitments in academic recruitment
 
-Gender under-representation (only 15% female undergraduates in CS/Engineering) makes anonymised recruitment essential for the AgriFoRwArdS CDT's commitment to empowering gender diversity.
+Anonymised recruitment is essential for addressing under-representation in STEM fields and ensuring fair evaluation of all candidates.
 
 ## Licence
 
-Proprietary - For use by AgriFoRwArdS CDT and authorised partners only.
+MIT License - Open source software for academic and institutional use.
 
 ## Version
 

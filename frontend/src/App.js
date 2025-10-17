@@ -66,7 +66,7 @@ function App() {
             PhD Application Anonymisation System
           </h1>
           <p className="subtitle">
-            AgriFoRwArdS CDT - Ensuring Fair and Anonymous Recruitment
+            Ensuring Fair and Anonymous Recruitment
           </p>
 
           <div className="info-banner">
@@ -233,8 +233,8 @@ function App() {
 
         <div className="footer">
           <p>
-            This anonymisation process supports the AgriFoRwArdS CDT commitment to 
-            Equality, Diversity and Inclusion in recruitment.
+            This anonymisation process supports equality, diversity and inclusion 
+            in recruitment by removing unconscious bias from candidate selection.
           </p>
         </div>
       </div>

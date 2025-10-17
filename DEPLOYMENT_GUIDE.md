@@ -211,4 +211,4 @@ For issues:
 ## Version
 1.0.0 - October 2025
 
-Developed for AgriFoRwArdS CDT - Supporting fair and unbiased recruitment in STEM.
+Supporting fair and unbiased recruitment in academic institutions.

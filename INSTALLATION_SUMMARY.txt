@@ -1,7 +1,7 @@
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║                                                                              ║
 ║              PhD APPLICATION ANONYMISATION SYSTEM - WEBAPP                   ║
-║                   AgriFoRwArdS CDT - Docker Deployment                       ║
+║                         Docker Deployment                                    ║
 ║                                                                              ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
@@ -134,7 +134,7 @@ Troubleshooting:
 🎯 BUILT FOR
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-AgriFoRwArdS CDT - Centre for Doctoral Training
+Academic Institutions and Research Organizations
 Supporting fair, unbiased recruitment in STEM fields
 Promoting equality, diversity, and inclusion
 
