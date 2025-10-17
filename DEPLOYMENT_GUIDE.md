@@ -52,11 +52,14 @@ Frontend (React + Nginx) :80 ─────┐
                                   │
                                   ├──> User Interface
                                   │
-Backend (Flask) :5000 ────────────┘
-    │
-    ├──> Claude API (redaction)
-    └──> python-docx (document processing)
+                                  ├──> Nginx Proxy (/api/*) ──> Backend (Flask) :5000 (internal)
+                                  │                                │
+                                  │                                ├──> Claude API (redaction)
+                                  │                                └──> python-docx (document processing)
+                                  └──────────────────────────────────
 ```
+
+**Note**: The backend runs on port 5000 internally within the Docker network, but is only accessible through the Nginx proxy. All external traffic uses port 80 (or 8099 as configured).
 
 ## What It Does
 

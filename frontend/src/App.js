@@ -7,7 +7,8 @@ function App() {
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
 
-  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+  // Use relative URL to proxy through Nginx - no need to specify backend port
+  const API_URL = '';
 
   const handleFileUpload = (event) => {
     const uploadedFile = event.target.files[0];
