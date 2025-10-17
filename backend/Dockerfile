@@ -12,11 +12,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code and LLM providers
-COPY app.py .
-COPY llm_interface.py .
-COPY llm_anthropic.py .
-COPY llm_ollama.py .
-COPY test_llm.py .
+COPY *.py .
 
 # Create upload directory
 RUN mkdir -p /tmp/uploads
